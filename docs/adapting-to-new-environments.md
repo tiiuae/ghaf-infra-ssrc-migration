@@ -34,8 +34,8 @@ If you still don't have nix package manager on your local host, install it follo
 
 Then, clone this repository:
 ```bash
-$ git clone https://github.com/tiiuae/ghaf-infra.git
-$ cd ghaf-infra
+$ git clone https://github.com/tiiuae/ghaf-infra-ssd.git
+$ cd ghaf-infra-ssd
 ```
 
 Bootstrap nix shell with `flakes` and `nix-command` as well as all the other commands that we will be using:

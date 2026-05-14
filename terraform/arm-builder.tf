@@ -5,10 +5,10 @@ locals {
   arm_num_builders = local.opts[local.conf].num_builders_aarch64
   # Hard-code the arm builder location to 'northeurope' due to limited support
   # of arm-based VMs in (many) Azure regions. For reference, see:
-  # https://github.com/tiiuae/ghaf-infra/pull/81#pullrequestreview-1927417660
-  arm_vm_location = "northeurope"
+  # https://github.com/tiiuae/ghaf-infra-ssrc/pull/81#pullrequestreview-1927417660
+  arm_vm_location = "uaenorth"
   # Is the rest of the infra also being deployed to 'northeurope'?
-  infra_in_eun = azurerm_resource_group.infra.location == "northeurope"
+  infra_in_eun = azurerm_resource_group.infra.location == "uaenorth"
   # If all resources are deployed to 'northeurope', jenkins-controller will
   # access the arm builder over the private network. If the rest of the infra
   # is not deployed in 'northeurope', jenkins-controller will access the arm
@@ -22,18 +22,18 @@ locals {
 
 resource "azurerm_virtual_network" "vnet_arm" {
   count               = local.infra_in_eun ? 0 : 1
-  name                = "ghaf-infra-vnet-arm"
-  address_space       = ["10.0.0.0/16"]
+  name                = "ghaf-infra-ssrc-vnet-arm"
+  address_space       = ["10.52.94.0/24"]
   location            = local.arm_vm_location
   resource_group_name = azurerm_resource_group.infra.name
 }
 
 resource "azurerm_subnet" "builders_arm" {
   count                = local.infra_in_eun ? 0 : 1
-  name                 = "ghaf-infra-builders-arm"
+  name                 = "ghaf-infra-ssrc-builders-arm"
   resource_group_name  = azurerm_resource_group.infra.name
   virtual_network_name = azurerm_virtual_network.vnet_arm[0].name
-  address_prefixes     = ["10.0.4.0/28"]
+  address_prefixes     = ["10.52.94.0/25"]
 }
 
 module "arm_builder_vm" {
@@ -43,7 +43,7 @@ module "arm_builder_vm" {
 
   resource_group_name         = azurerm_resource_group.infra.name
   location                    = local.arm_vm_location
-  virtual_machine_name        = "ghaf-builder-aarch64-${count.index}-${local.ws}"
+  virtual_machine_name        = "ghaf-builder-ssrc-aarch64-${count.index}-${local.ws}"
   virtual_machine_size        = local.opts[local.conf].vm_size_builder_aarch64
   virtual_machine_osdisk_size = local.opts[local.conf].osdisk_size_builder
   binary_cache_public_key     = local.binary_cache_public_key

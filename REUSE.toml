@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 version = 1
-SPDX-PackageName = "ghaf-infra"
+SPDX-PackageName = "ghaf-infra-ssd"
 SPDX-PackageSupplier = "Technology Innovation Institute <https://tii.ae>"
-SPDX-PackageDownloadLocation = "https://github.com/tiiuae/ghaf-infra"
+SPDX-PackageDownloadLocation = "https://github.com/tiiuae/ghaf-infra-ssd"
 
 [[annotations]]
 SPDX-License-Identifier = "Apache-2.0"

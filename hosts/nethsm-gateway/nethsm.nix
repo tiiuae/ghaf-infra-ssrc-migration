@@ -121,7 +121,7 @@ in
               description: Tampere Office NetHSM
 
               operator:
-                username: ghafinfrasign~ghafsigner
+                username: ghafinfrassdsign~ghafsigner
                 password: ${config.sops.placeholder.nethsm-operator-password}
 
               instances:

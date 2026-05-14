@@ -20,15 +20,15 @@ remote_state {
   # TODO: manage resources hosting state itself with terragrunt too
   config = {
     # We currently use the same blob container for all state.
-    resource_group_name = "ghaf-infra-0-state-eun"
-    storage_account_name = "ghafinfra0stateeun"
-    container_name = "ghaf-infra-tfstate-container"
+    resource_group_name = "ghaf-infra-ssrc-0-state-eun"
+    storage_account_name = "ghafinfrassrc0stateeun"
+    container_name = "ghaf-infra-ssrc-tfstate-container"
     key = "${path_relative_to_include()}.tfstate"
   }
 }
 
 inputs  = {
-  environment_name = "ghaf-infra-${local.env_name}"
+  environment_name = "ghaf-infra-ssrc-${local.env_name}"
   location = "northeurope"
 }
 

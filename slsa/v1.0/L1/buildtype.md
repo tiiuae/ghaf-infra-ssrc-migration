@@ -12,7 +12,7 @@ This build type was inspired by the Cimon Jenkins build type described [here](ht
 ## Description
 
 ```json
-"buildType": "https://github.com/tiiuae/ghaf-infra/blob/main/slsa/v1.0/L1/buildtype.md"
+"buildType": "https://github.com/tiiuae/ghaf-infra-ssd/blob/main/slsa/v1.0/L1/buildtype.md"
 ```
 
 This build type describes the execution of a Jenkins workflow that builds a software artifact using nix.

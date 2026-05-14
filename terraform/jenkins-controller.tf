@@ -26,14 +26,14 @@ module "jenkins_controller_vm" {
 
   resource_group_name          = azurerm_resource_group.infra.name
   location                     = azurerm_resource_group.infra.location
-  virtual_machine_name         = "ghaf-jenkins-controller-${local.ws}"
+  virtual_machine_name         = "ghaf-jenkins-controller-ssrc-${local.ws}"
   virtual_machine_size         = local.opts[local.conf].vm_size_controller
   virtual_machine_osdisk_size  = local.opts[local.conf].osdisk_size_controller
   virtual_machine_source_image = module.jenkins_controller_image.image_id
 
   virtual_machine_custom_data = join("\n", ["#cloud-config", yamlencode({
     users = [
-      for user in toset(["bmg", "flokli", "hrosten", "jrautiola", "cazfi", "vjuntunen", "ktu", "alextserepov", "fayad"]) : {
+      for user in toset(["uday", "john", "alessandro"]) : {
         name                = user
         groups              = "wheel"
         ssh_authorized_keys = local.ssh_keys[user]
@@ -57,16 +57,16 @@ module "jenkins_controller_vm" {
         content = "AZURE_STORAGE_ACCOUNT_NAME=${data.azurerm_storage_account.jenkins_artifacts.name}",
         "path"  = "/var/lib/rclone-jenkins-artifacts/env"
       },
-      {
-        content = join("\n", toset([
-          "OAUTH2_PROXY_COOKIE_SECRET=${random_id.oauth2_proxy_cookie_secret.b64_url}",
-          # client id and secret that are present in dex 
-          "OAUTH2_PROXY_CLIENT_ID=ghaf-jenkins-controller-${azurerm_resource_group.infra.location}",
-          "OAUTH2_PROXY_CLIENT_SECRET=${data.sops_file.secrets.data["oauth2_proxy_client_secret"]}",
-          "OAUTH2_PROXY_COOKIE_DOMAINS=ghaf-jenkins-controller-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com",
-        ])),
-        "path" = "/var/lib/oauth2-proxy.env"
-      },
+      #{
+      #  content = join("\n", toset([
+      #    "OAUTH2_PROXY_COOKIE_SECRET=${random_id.oauth2_proxy_cookie_secret.b64_url}",
+      #    # client id and secret that are present in dex 
+      #    "OAUTH2_PROXY_CLIENT_ID=ghaf-jenkins-controller-${azurerm_resource_group.infra.location}",
+      #    "OAUTH2_PROXY_CLIENT_SECRET=${data.sops_file.secrets.data["oauth2_proxy_client_secret"]}",
+      #    "OAUTH2_PROXY_COOKIE_DOMAINS=ghaf-jenkins-controller-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com",
+      #  ])),
+      #  "path" = "/var/lib/oauth2-proxy.env"
+      #},
       # Render /etc/nix/machines with terraform. In the future, we might want to
       # autodiscover this, or better, have agents register with the controller,
       # rather than having to recreate the VM whenever the list of builders is
@@ -84,19 +84,19 @@ module "jenkins_controller_vm" {
         content = join("\n", toset(concat(
           module.builder_vm[*].virtual_machine_ip_address,
           module.arm_builder_vm[*].virtual_machine_ip_address,
-          local.opts[local.conf].ext_builder_keyscan,
+         # local.opts[local.conf].ext_builder_keyscan,
         ))),
         "path" = "/var/lib/builder-keyscan/scanlist"
       },
       {
-        content = "SITE_ADDRESS=ghaf-jenkins-controller-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com",
+        content = "SITE_ADDRESS=ghaf-jenkins-controller-ssrc-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com",
         "path"  = "/var/lib/caddy/caddy.env"
       },
       # JENKINS_URL is read from this file by JCasC plugin
       # Configuration: hosts/azure/jenkins-controller/jenkins-casc.yaml
       # Value: jenkins: unclassified: location: url
       {
-        content = "https://ghaf-jenkins-controller-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com",
+        content = "https://ghaf-jenkins-controller-ssrc-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com",
         "path"  = "/var/lib/jenkins-casc/url"
       }
     ]
@@ -219,6 +219,6 @@ resource "azurerm_key_vault_access_policy" "binary_cache_signing_key_jenkins_con
   ]
 }
 
-resource "random_id" "oauth2_proxy_cookie_secret" {
-  byte_length = 32
-}
+#resource "random_id" "oauth2_proxy_cookie_secret" {
+#  byte_length = 32
+#}

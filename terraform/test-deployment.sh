@@ -18,7 +18,7 @@ RED='' GREEN='' WHITE='' NONE=''
 usage () {
     echo "Usage: $MYNAME [-h] [-v] [-l LOCATION] [-p PUBKEY] -w WORKSPACE"
     echo ""
-    echo "Perform basic end-to-end testing for ghaf-infra deployment."
+    echo "Perform basic end-to-end testing for ghaf-infra-ssrc deployment."
     echo "The target deployment is determined based on WORKSPACE and"
     echo "LOCATION arguments."
     echo ""
@@ -35,10 +35,10 @@ usage () {
     echo "Example:"
     echo ""
     echo "  Following command runs basic end-to-end testing for the"
-    echo "  ghaf-infra instance deployed in workspace 'myghafinfra'"
+    echo "  ghaf-infra-ssrc instance deployed in workspace 'myghafinfrassrc'"
     echo "  in the default LOCATION (northeurope):"
     echo ""
-    echo "  $MYNAME -w myghafinfra"
+    echo "  $MYNAME -w myghafinfrassrc"
     echo ""
 }
 

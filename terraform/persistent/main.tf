@@ -20,8 +20,8 @@ terraform {
   backend "azurerm" {
     # resource_group_name and storage_account_name are set by the callee
     # from command line in terraform init, see terraform-init.sh
-    container_name = "ghaf-infra-tfstate-container"
-    key            = "ghaf-infra-persistent.tfstate"
+    container_name = "ghaf-infra-ssrc-tfstate-container"
+    key            = "ghaf-infra-ssrc-persistent.tfstate"
   }
 }
 
@@ -71,7 +71,7 @@ data "azurerm_client_config" "current" {}
 module "builder_ssh_key" {
   source = "./builder-ssh-key"
   # Must be globally unique, max 24 characters
-  builder_ssh_keyvault_name = "sshb-id0ext${local.shortloc}"
+  builder_ssh_keyvault_name = "sshb-ssrc-id0ext${local.shortloc}"
   resource_group_name       = azurerm_resource_group.persistent.name
   location                  = azurerm_resource_group.persistent.location
   tenant_id                 = data.azurerm_client_config.current.tenant_id

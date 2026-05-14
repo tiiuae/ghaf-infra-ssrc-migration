@@ -29,8 +29,8 @@ terraform {
   backend "azurerm" {
     # resource_group_name and storage_account_name are set by the callee
     # from command line in terraform init, see terraform-init.sh
-    container_name = "ghaf-infra-tfstate-container"
-    key            = "ghaf-infra.tfstate"
+    container_name = "ghaf-infra-ssrc-tfstate-container"
+    key            = "ghaf-infra-ssrc.tfstate"
   }
 }
 
@@ -91,7 +91,7 @@ locals {
   # Such alternative names need to be manually configured for each instance
   # (once) in the relevant host's caddy config at /var/lib/caddy/caddy.env,
   # setting the SITE_ADDRESS accordingly.
-  binary_cache_url        = "https://ghaf-binary-cache-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com"
+  binary_cache_url        = "https://ghaf-binary-cache-ssrc-${local.ws}.${azurerm_resource_group.infra.location}.cloudapp.azure.com"
   binary_cache_public_key = data.azurerm_key_vault_secret.binary_cache_signing_key_pub.value
 
   # Environment-specific configuration options.
@@ -117,10 +117,10 @@ locals {
       persistent_id           = "prod"
       vm_size_binarycache     = "Standard_D2_v5"
       osdisk_size_binarycache = "250"
-      vm_size_builder_x86     = "Standard_D16_v5"
-      vm_size_builder_aarch64 = "Standard_D8ps_v5"
+      vm_size_builder_x86     = "Standard_D8d_v5"
+      vm_size_builder_aarch64 = "Standard_D8plds_v6"
       osdisk_size_builder     = "250"
-      vm_size_controller      = "Standard_E4_v5"
+      vm_size_controller      = "Standard_D8d_v5"
       osdisk_size_controller  = "1000"
       num_builders_x86        = 0
       num_builders_aarch64    = 0
@@ -131,15 +131,15 @@ locals {
       persistent_id           = "prod"
       vm_size_binarycache     = "Standard_D4_v3"
       osdisk_size_binarycache = "250"
-      vm_size_builder_x86     = "Standard_D16_v5"
+      vm_size_builder_x86     = "Standard_F64s_v2"
       vm_size_builder_aarch64 = "Standard_D8ps_v5"
       osdisk_size_builder     = "250"
-      vm_size_controller      = "Standard_E16_v5"
-      osdisk_size_controller  = "1000"
-      num_builders_x86        = 0
-      num_builders_aarch64    = 0
-      ext_builder_machines    = local.ext_builder_machines
-      ext_builder_keyscan     = local.ext_builder_keyscan
+      vm_size_controller      = "Standard_E16s_v4"
+      osdisk_size_controller  = "2000"
+      num_builders_x86        = 1
+      num_builders_aarch64    = 1
+      ext_builder_machines    = []
+      ext_builder_keyscan     = []
     }
     release = {
       persistent_id           = "release"
@@ -160,7 +160,7 @@ locals {
   # Read ssh-keys.yaml into local.ssh_keys
   ssh_keys = yamldecode(file("../ssh-keys.yaml"))
 
-  # Determine the configuration options used in the ghaf-infra instance
+  # Determine the configuration options used in the ghaf-infra-ssrc instance
   # based on the workspace name
   is_release = length(regexall("^release.*", local.ws)) > 0
   is_prod    = length(regexall("^prod.*", local.ws)) > 0
@@ -173,21 +173,21 @@ locals {
     ("${local.conf}" != "priv" && !(var.convince)) ?
   "((Force invalid regex pattern\n\nERROR: Deployment to non-priv requires variable 'convince'" : "", "")
 
-  # Selects the persistent data for this ghaf-infra instance (see ./persistent)
+  # Selects the persistent data for this ghaf-infra-ssrc instance (see ./persistent)
   persistent_rg = local.envs["persistent_rg_name"]
   persistent_id = "id0${local.opts[local.conf].persistent_id}${local.shortloc}"
 
   # Selects builder ssh key
   use_ext_builders  = length(local.opts[local.conf].ext_builder_machines) > 0
-  builder_sshkey_id = local.use_ext_builders ? "sshb-id0ext${local.shortloc}" : "sshb${local.ws}${local.shortloc}"
-  builder_sshkey_rg = local.use_ext_builders ? local.persistent_rg : "ghaf-infra-${local.ws}"
+  builder_sshkey_id = local.use_ext_builders ? "sshb-idssrc0ext${local.shortloc}" : "sshbssrc${local.ws}${local.shortloc}"
+  builder_sshkey_rg = local.use_ext_builders ? local.persistent_rg : "ghaf-infra-ssrc-${local.ws}"
 }
 
 ################################################################################
 
-# Resource group for this ghaf-infra instance
+# Resource group for this ghaf-infra-ssrc instance
 resource "azurerm_resource_group" "infra" {
-  name     = "ghaf-infra-${local.ws}"
+  name     = "ghaf-infra-ssrc-${local.ws}"
   location = data.azurerm_storage_account.tfstate.location
 }
 
@@ -197,26 +197,26 @@ resource "azurerm_resource_group" "infra" {
 
 # Virtual network
 resource "azurerm_virtual_network" "vnet" {
-  name                = "ghaf-infra-vnet"
-  address_space       = ["10.0.0.0/16"]
+  name                = "ghaf-infra-ssrc-vnet"
+  address_space       = ["10.52.84.0/22"]
   location            = azurerm_resource_group.infra.location
   resource_group_name = azurerm_resource_group.infra.name
 }
 
 # Slice out a subnet for jenkins
 resource "azurerm_subnet" "jenkins" {
-  name                 = "ghaf-infra-jenkins"
+  name                 = "ghaf-infra-ssrc-jenkins"
   resource_group_name  = azurerm_resource_group.infra.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.2.0/24"]
+  address_prefixes     = ["10.52.84.0/26"]
 }
 
 # Slice out a subnet for the builders
 resource "azurerm_subnet" "builders" {
-  name                 = "ghaf-infra-builders"
+  name                 = "ghaf-infra-ssrc-builders"
   resource_group_name  = azurerm_resource_group.infra.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.4.0/28"]
+  address_prefixes     = ["10.52.84.128/26"]
 }
 
 # https://github.com/hashicorp/terraform-provider-azurerm/issues/15609
@@ -237,7 +237,7 @@ resource "azurerm_storage_account" "vm_images" {
 }
 
 resource "azurerm_storage_container" "vm_images" {
-  name                  = "ghaf-infra-vm-images"
+  name                  = "ghaf-infra-ssrc-vm-images"
   storage_account_name  = azurerm_storage_account.vm_images.name
   container_access_type = "private"
 }
@@ -294,7 +294,7 @@ data "azurerm_key_vault_secret" "ssh_remote_build_pub" {
 
 # Binary cache storage
 data "azurerm_storage_account" "binary_cache" {
-  name                = "bches${local.persistent_id}"
+  name                = "bchesssrc${local.persistent_id}"
   resource_group_name = local.persistent_rg
 }
 
@@ -305,7 +305,7 @@ data "azurerm_storage_container" "binary_cache_1" {
 
 # Binary cache signing key
 data "azurerm_key_vault" "binary_cache_signing_key" {
-  name                = "bchek-${local.persistent_id}"
+  name                = "bchek-ssrc-${local.persistent_id}"
   resource_group_name = local.persistent_rg
   provider            = azurerm
 }
@@ -324,8 +324,8 @@ data "azurerm_key_vault_secret" "binary_cache_signing_key_pub" {
 
 # Reference the existing Key Vault
 data "azurerm_key_vault" "ghaf_devenv_ca" {
-  name                = "ghaf-devenv-ca"
-  resource_group_name = "ghaf-devenev-pki"
+  name                = "ghaf-ssrc-uae-devenv-ca"
+  resource_group_name = "ghaf-ssrc-devenev-pki"
 }
 
 # Data sources to access 'workspace-specific persistent' data
@@ -345,7 +345,7 @@ data "azurerm_managed_disk" "jenkins_controller_caddy_state" {
 
 # Jenkins artifacts storage
 data "azurerm_storage_account" "jenkins_artifacts" {
-  name                = "artifact${local.ws}"
+  name                = "artifactssrc${local.ws}"
   resource_group_name = local.persistent_rg
 }
 

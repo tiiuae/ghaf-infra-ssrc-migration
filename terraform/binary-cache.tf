@@ -24,14 +24,14 @@ module "binary_cache_vm" {
 
   resource_group_name          = azurerm_resource_group.infra.name
   location                     = azurerm_resource_group.infra.location
-  virtual_machine_name         = "ghaf-binary-cache-${local.ws}"
+  virtual_machine_name         = "ghaf-binary-cache-ssrc-${local.ws}"
   virtual_machine_size         = local.opts[local.conf].vm_size_binarycache
   virtual_machine_osdisk_size  = local.opts[local.conf].osdisk_size_binarycache
   virtual_machine_source_image = module.binary_cache_image.image_id
 
   virtual_machine_custom_data = join("\n", ["#cloud-config", yamlencode({
     users = [
-      for user in toset(["bmg", "flokli", "hrosten", "jrautiola", "vjuntunen", "cazfi", "fayad"]) : {
+      for user in toset(["bmg", "flokli", "hrosten", "jrautiola", "vjuntunen", "cazfi", "fayad", "john"]) : {
         name                = user
         sudo                = "ALL=(ALL) NOPASSWD:ALL"
         ssh_authorized_keys = local.ssh_keys[user]
@@ -41,7 +41,7 @@ module "binary_cache_vm" {
     write_files = [
       {
         content = "AZURE_STORAGE_ACCOUNT_NAME=${data.azurerm_storage_account.binary_cache.name}",
-        "path"  = "/var/lib/azure-nix-cache-proxy/env"
+        "path"  = "/var/lib/rclone-http/env"
       },
       {
         content = "SITE_ADDRESS=${local.binary_cache_url}"
@@ -65,10 +65,10 @@ module "binary_cache_vm" {
 }
 
 resource "azurerm_subnet" "binary_cache" {
-  name                 = "ghaf-infra-binary-cache"
+  name                 = "ghaf-infra-ssrc-binary-cache"
   resource_group_name  = azurerm_resource_group.infra.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.3.0/28"]
+  address_prefixes     = ["10.52.84.64/26"]
 }
 
 # Allow inbound HTTP(S)

@@ -8,7 +8,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 > [Nebula](https://github.com/slackhq/nebula) is a scalable overlay networking tool with a focus on performance,
 simplicity and security. It lets you seamlessly connect computers anywhere in the world.
 
-Nebula is used in ghaf-infra to create a network between servers in the Tampere office and hetzner.
+Nebula is used in ghaf-infra-ssd to create a network between servers in the Tampere office and hetzner.
 
 ![diagram](./nebula-monitoring.png)
 

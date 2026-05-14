@@ -35,150 +35,150 @@ let
         exit $ERR
       '';
 
-  jenkins-casc = {
-    appearance = {
-      pipelineGraphView = {
-        showGraphOnBuildPage = true;
-      };
-    };
-    jenkins = {
-      authorizationStrategy = {
-        globalMatrix = {
-          entries = [
-            {
-              group = {
-                name = "authenticated";
-                permissions = [
-                  "Overall/Read"
-                  "Job/Read"
-                ];
-              };
-            }
-            {
-              group = {
-                name = "tiiuae:devenv-fi";
-                permissions = [
-                  "Overall/Administer"
-                ];
-              };
-            }
-            # used locally by testagent ssh connections
-            {
-              group = {
-                name = "testagents";
-                permissions = [
-                  "Agent/Connect"
-                ];
-              };
-            }
-          ];
-        };
-      };
-      markupFormatter = {
-        rawHtml = {
-          disableSyntaxHighlighting = false;
-        };
-      };
-
-      numExecutors = 4;
-      securityRealm = {
-        reverseProxy = {
-          customLogOutUrl = "/oauth2/sign_out";
-          forwardedDisplayName = "X-Forwarded-DisplayName";
-          forwardedEmail = "X-Forwarded-Mail";
-          forwardedUser = "X-Forwarded-User";
-          headerGroups = "X-Forwarded-Groups";
-          headerGroupsDelimiter = ",";
-          disableLdapEmailResolver = true;
-          inhibitInferRootDN = false;
-        };
-      };
-
-      nodes = # all permutations of device and set lists
-        lib.mapCartesianProduct
-          (
-            { set, device }:
-            {
-              permanent = {
-                name = "${set}-${device}";
-                labelString = device;
-                launcher = "inbound";
-                mode = "EXCLUSIVE";
-                remoteFS = "/var/lib/jenkins/agents/${device}";
-                retentionStrategy = "always";
-              };
-            }
-          )
-          {
-            set = [
-              "dev"
-              "prod"
-              "release"
-            ];
-            device = [
-              "lenovo-x1"
-              "orin-agx-64"
-              "orin-agx"
-              "orin-nx"
-              "dell-7330"
-              "darter-pro"
-            ];
-          };
-    };
-
-    unclassified = {
-      location = {
-        url = "\${file:/var/lib/jenkins-casc/url}";
-      };
-      lockableResourcesManager = {
-        declaredResources = [
-          {
-            description = "Nix evaluator lock";
-            name = "evaluator";
-          }
-          {
-            description = "SBOM generation lock";
-            name = "sbom";
-          }
-        ];
-      };
-      timestamper = {
-        allPipelines = true;
-      };
-    };
-
-    jobs =
-      lib.mapAttrsToList
-        (displayName: script: {
-          script = ''
-            pipelineJob('${script}') {
-              definition {
-                cpsScm {
-                  scm {
-                    git {
-                      remote {
-                        url('https://github.com/tiiuae/ghaf-jenkins-pipeline.git')
-                      }
-                      branch('*/main')
-                    }
-                  }
-                  scriptPath('${script}.groovy')
-                  lightweight()
-                }
-              }
-              displayName('${displayName}')
-            }'';
-        })
-        {
-          "Ghaf main pipeline" = "ghaf-main-pipeline";
-          "Ghaf pre-merge pipeline" = "ghaf-pre-merge-pipeline";
-          "Ghaf nightly pipeline" = "ghaf-nightly-pipeline";
-          "Ghaf release pipeline" = "ghaf-release-pipeline";
-          "Ghaf release laptop pipeline" = "ghaf-release-laptop-pipeline";
-          "Ghaf performance tests" = "ghaf-perftest-pipeline";
-          "Ghaf HW test" = "ghaf-hw-test";
-        };
-  };
+#  jenkins-casc = {
+#    appearance = {
+#      pipelineGraphView = {
+#        showGraphOnBuildPage = true;
+#      };
+#    };
+#    jenkins = {
+#      authorizationStrategy = {
+#        globalMatrix = {
+#          entries = [
+#            {
+#              group = {
+#                name = "authenticated";
+#                permissions = [
+#                  "Overall/Read"
+#                  "Job/Read"
+#                ];
+#              };
+#            }
+#            {
+#              group = {
+#                name = "tiiuae:devenv-fi";
+#                permissions = [
+#                  "Overall/Administer"
+#                ];
+#              };
+#            }
+#            # used locally by testagent ssh connections
+#            {
+#              group = {
+#                name = "testagents";
+#                permissions = [
+#                  "Agent/Connect"
+#                ];
+#              };
+#            }
+#          ];
+#        };
+#      };
+#      markupFormatter = {
+#        rawHtml = {
+#          disableSyntaxHighlighting = false;
+#        };
+#      };
+#
+#      numExecutors = 4;
+#      securityRealm = {
+#        reverseProxy = {
+#          customLogOutUrl = "/oauth2/sign_out";
+#          forwardedDisplayName = "X-Forwarded-DisplayName";
+#          forwardedEmail = "X-Forwarded-Mail";
+#          forwardedUser = "X-Forwarded-User";
+#          headerGroups = "X-Forwarded-Groups";
+#          headerGroupsDelimiter = ",";
+#          disableLdapEmailResolver = true;
+#          inhibitInferRootDN = false;
+#        };
+#      };
+#
+#      nodes = # all permutations of device and set lists
+#        lib.mapCartesianProduct
+#          (
+#            { set, device }:
+#            {
+#              permanent = {
+#                name = "${set}-${device}";
+#                labelString = device;
+#                launcher = "inbound";
+#                mode = "EXCLUSIVE";
+#                remoteFS = "/var/lib/jenkins/agents/${device}";
+#                retentionStrategy = "always";
+#              };
+#            }
+#          )
+#          {
+#            set = [
+#              "dev"
+#              "prod"
+#              "release"
+#            ];
+#            device = [
+#              "lenovo-x1"
+#              "orin-agx-64"
+#              "orin-agx"
+#              "orin-nx"
+#              "dell-7330"
+#              "darter-pro"
+#            ];
+#          };
+#    };
+#
+#    unclassified = {
+#      location = {
+#        url = "\${file:/var/lib/jenkins-casc/url}";
+#      };
+#      lockableResourcesManager = {
+#        declaredResources = [
+#          {
+#            description = "Nix evaluator lock";
+#            name = "evaluator";
+#          }
+#          {
+#            description = "SBOM generation lock";
+#            name = "sbom";
+#          }
+#        ];
+#      };
+#      timestamper = {
+#        allPipelines = true;
+#      };
+#    };
+#
+#    jobs =
+#      lib.mapAttrsToList
+#        (displayName: script: {
+#          script = ''
+#            pipelineJob('${script}') {
+#              definition {
+#                cpsScm {
+#                  scm {
+#                    git {
+#                      remote {
+#                        url('https://github.com/tiiuae/ghaf-jenkins-pipeline.git')
+#                      }
+#                      branch('*/main')
+#                    }
+#                  }
+#                  scriptPath('${script}.groovy')
+#                  lightweight()
+#                }
+#              }
+#              displayName('${displayName}')
+#            }'';
+#        })
+#        {
+#          "Ghaf main pipeline" = "ghaf-main-pipeline";
+#          "Ghaf pre-merge pipeline" = "ghaf-pre-merge-pipeline";
+#          "Ghaf nightly pipeline" = "ghaf-nightly-pipeline";
+#          "Ghaf release pipeline" = "ghaf-release-pipeline";
+#          "Ghaf release laptop pipeline" = "ghaf-release-laptop-pipeline";
+#          "Ghaf performance tests" = "ghaf-perftest-pipeline";
+#          "Ghaf HW test" = "ghaf-hw-test";
+#        };
+#  };
 
   get-secret =
     pkgs.writers.writePython3 "get-secret"
@@ -224,31 +224,31 @@ in
     self.nixosModules.service-monitoring
   ];
 
-  users.users = {
-    testagent-dev = {
-      isNormalUser = true;
-      openssh.authorizedKeys.keys = [ machines.testagent-dev.publicKey ];
-    };
-    testagent-prod = {
-      isNormalUser = true;
-      openssh.authorizedKeys.keys = [ machines.testagent-prod.publicKey ];
-    };
-    testagent-release = {
-      isNormalUser = true;
-      openssh.authorizedKeys.keys = [ machines.testagent-release.publicKey ];
-    };
-    testagent-uae-dev = {
-      isNormalUser = true;
-      openssh.authorizedKeys.keys = [ machines.testagent-uae-dev.publicKey ];
-    };
-  };
-
-  services.monitoring = {
-    metrics.enable = true;
-    metrics.openFirewall = true;
-    metrics.ssh = true;
-    logs.enable = false;
-  };
+#  users.users = {
+#    testagent-dev = {
+#      isNormalUser = true;
+#      openssh.authorizedKeys.keys = [ machines.testagent-dev.publicKey ];
+#    };
+#    testagent-prod = {
+#      isNormalUser = true;
+#      openssh.authorizedKeys.keys = [ machines.testagent-prod.publicKey ];
+#    };
+#    testagent-release = {
+#      isNormalUser = true;
+#      openssh.authorizedKeys.keys = [ machines.testagent-release.publicKey ];
+#    };
+#    testagent-uae-dev = {
+#      isNormalUser = true;
+#      openssh.authorizedKeys.keys = [ machines.testagent-uae-dev.publicKey ];
+#    };
+#  };
+#
+#  services.monitoring = {
+#    metrics.enable = false;
+#    metrics.openFirewall = true;
+#    metrics.ssh = true;
+#    logs.enable = false;
+#  };
 
   # Configure /var/lib/jenkins in /etc/fstab.
   # Due to an implicit RequiresMountsFor=$state-dir, systemd
@@ -287,10 +287,12 @@ in
         nix
         git
         zstd
+        openssh
         jq
         csvkit
         curl
         nix-eval-jobs
+        softhsm
       ]
       ++ [
         rclone # used to copy artifacts
@@ -304,37 +306,37 @@ in
       # If we want to allow robot framework reports, we need to adjust Jenkins CSP:
       # https://plugins.jenkins.io/robot/#plugin-content-log-file-not-showing-properly
       "-Dhudson.model.DirectoryBrowserSupport.CSP=\"sandbox allow-scripts; default-src 'none'; img-src 'self' data: ; style-src 'self' 'unsafe-inline' data: ; script-src 'self' 'unsafe-inline' 'unsafe-eval';\""
-      # Disable the initial setup wizard, and the creation of initialAdminPassword.
+      # Disable the intitial setup wizard, and the creation of initialAdminPassword.
       "-Djenkins.install.runSetupWizard=false"
       # Point to configuration-as-code config
-      "-Dcasc.jenkins.config=${builtins.toFile "jenkins-casc.yaml" (builtins.toJSON jenkins-casc)}"
+      #"-Dcasc.jenkins.config=${builtins.toFile "jenkins-casc.yaml" (builtins.toJSON jenkins-casc)}"
       # Increase the number of rows shown in Stage View (default is 10)
-      "-Dcom.cloudbees.workflow.rest.external.JobExt.maxRunsPerJob=32"
+      #"-Dcom.cloudbees.workflow.rest.external.JobExt.maxRunsPerJob=32"
     ];
 
-    plugins =
-      let
-        manifest = builtins.fromJSON (builtins.readFile ./plugins.json);
-
-        mkJenkinsPlugin =
-          {
-            name,
-            version,
-            url,
-            sha256,
-          }:
-          lib.nameValuePair name (
-            pkgs.stdenv.mkDerivation {
-              inherit name version;
-              src = pkgs.fetchurl {
-                inherit url sha256;
-              };
-              phases = "installPhase";
-              installPhase = "cp \$src \$out";
-            }
-          );
-      in
-      builtins.listToAttrs (map mkJenkinsPlugin manifest);
+#    plugins =
+#      let
+#        manifest = builtins.fromJSON (builtins.readFile ./plugins.json);
+#
+#        mkJenkinsPlugin =
+#          {
+#            name,
+#            version,
+#            url,
+#            sha256,
+#          }:
+#          lib.nameValuePair name (
+#            pkgs.stdenv.mkDerivation {
+#              inherit name version;
+#              src = pkgs.fetchurl {
+#                inherit url sha256;
+#              };
+#              phases = "installPhase";
+#              installPhase = "cp \$src \$out";
+#            }
+#          );
+#      in
+#      builtins.listToAttrs (map mkJenkinsPlugin manifest);
   };
 
   systemd.services.jenkins.serviceConfig = {
@@ -525,112 +527,136 @@ in
 
   services.caddy = {
     enable = true;
-    enableReload = false;
     configFile = pkgs.writeText "Caddyfile" ''
       # Disable the admin API, we don't want to reconfigure Caddy at runtime.
       {
         admin off
       }
 
+      # Proxy all requests to jenkins.
       https://{$SITE_ADDRESS} {
-
-        @unauthenticated {
-          # github sends webhook triggers here
-          path /github-webhook /github-webhook/*
-
-          # testagents need these
-          path /jnlpJars /jnlpJars/*
-          path /wsagents /wsagents/*
-        }
-
-        handle @unauthenticated {
-          reverse_proxy localhost:8081
-        }
-
-        # Route /artifacts requests to rclone-jenkins-artifacts-browse,
-        # stripping `/artifacts` from the path.
-        handle_path /artifacts/* {
-          reverse_proxy unix//run/rclone-jenkins-artifacts-browse.sock
-        }
-
-        # Proxy all other requests to jenkins as-is, but delegate auth to
-        # oauth2-proxy.
-        # Also see https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration#configuring-for-use-with-the-caddy-v2-forward_auth-directive
-
-        handle /oauth2/* {
-          reverse_proxy localhost:4180 {
-            # oauth2-proxy requires the X-Real-IP and X-Forwarded-{Proto,Host,Uri} headers.
-            # The reverse_proxy directive automatically sets X-Forwarded-{For,Proto,Host} headers.
-            header_up X-Real-IP {remote_host}
-            header_up X-Forwarded-Uri {uri}
-          }
-        }
-
-        handle {
-          forward_auth localhost:4180 {
-            uri /oauth2/auth
-
-            # oauth2-proxy requires the X-Real-IP and X-Forwarded-{Proto,Host,Uri} headers.
-            # The forward_auth directive automatically sets the X-Forwarded-{For,Proto,Host,Method,Uri} headers.
-            header_up X-Real-IP {remote_host}
-
-            copy_headers {
-              X-Auth-Request-User>X-Forwarded-User
-              X-Auth-Request-Groups>X-Forwarded-Groups
-              X-Auth-Request-Email>X-Forwarded-Mail
-              X-Auth-Request-Preferred-Username>X-Forwarded-DisplayName
-            }
-
-            # If oauth2-proxy returns a 401 status, redirect the client to the sign-in page.
-            @error status 401
-            handle_response @error {
-              redir * /oauth2/sign_in?rd={scheme}://{host}{uri}
-            }
-          }
-          reverse_proxy localhost:8081
-        }
+        reverse_proxy localhost:8081
       }
-    '';
+      https://ghaf-ci.ssrcdevops.tii.ae {
+        # For this domain, use the custom certificate and key
+        tls /var/lib/caddy/ssrcdevops-custom/cert.pem /var/lib/caddy/ssrcdevops-custom/key.pem
+
+        # Otherwise the proxy configuration is the same
+        reverse_proxy localhost:8081
+      }
+     '';
   };
 
-  services.oauth2-proxy = {
-    enable = true;
 
-    # We inject cookie secret, client id and client secret through terraform in cloud-init
-    clientID = null;
-    clientSecret = null;
-    cookie.secret = null;
 
-    provider = "oidc";
-    oidcIssuerUrl = "https://auth.vedenemo.dev";
-    setXauthrequest = true;
-    cookie.secure = false;
+#  services.caddy = {
+#    enable = true;
+#    enableReload = false;
+#    configFile = pkgs.writeText "Caddyfile" ''
+#      # Disable the admin API, we don't want to reconfigure Caddy at runtime.
+#      {
+#        admin off
+#      }
+#
+#      https://{$SITE_ADDRESS} {
+#
+#        @unauthenticated {
+#          # github sends webhook triggers here
+#          path /github-webhook /github-webhook/*
+#
+#          # testagents need these
+#          path /jnlpJars /jnlpJars/*
+#          path /wsagents /wsagents/*
+#        }
+#
+#        handle @unauthenticated {
+#          reverse_proxy localhost:8081
+#        }
+#
+#        # Route /artifacts requests to rclone-jenkins-artifacts-browse,
+#        # stripping `/artifacts` from the path.
+#        handle_path /artifacts/* {
+#          reverse_proxy unix//run/rclone-jenkins-artifacts-browse.sock
+#        }
+#
+#        # Proxy all other requests to jenkins as-is, but delegate auth to
+#        # oauth2-proxy.
+#        # Also see https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration#configuring-for-use-with-the-caddy-v2-forward_auth-directive
+#
+#        handle /oauth2/* {
+#          reverse_proxy localhost:4180 {
+#            # oauth2-proxy requires the X-Real-IP and X-Forwarded-{Proto,Host,Uri} headers.
+#            # The reverse_proxy directive automatically sets X-Forwarded-{For,Proto,Host} headers.
+#            header_up X-Real-IP {remote_host}
+#            header_up X-Forwarded-Uri {uri}
+#          }
+#        }
+#
+#        handle {
+#          forward_auth localhost:4180 {
+#            uri /oauth2/auth
+#
+#            # oauth2-proxy requires the X-Real-IP and X-Forwarded-{Proto,Host,Uri} headers.
+#            # The forward_auth directive automatically sets the X-Forwarded-{For,Proto,Host,Method,Uri} headers.
+#            header_up X-Real-IP {remote_host}
+#
+#            copy_headers {
+#              X-Auth-Request-User>X-Forwarded-User
+#              X-Auth-Request-Groups>X-Forwarded-Groups
+#              X-Auth-Request-Email>X-Forwarded-Mail
+#              X-Auth-Request-Preferred-Username>X-Forwarded-DisplayName
+#            }
+#
+#            # If oauth2-proxy returns a 401 status, redirect the client to the sign-in page.
+#            @error status 401
+#            handle_response @error {
+#              redir * /oauth2/sign_in?rd={scheme}://{host}{uri}
+#            }
+#          }
+#          reverse_proxy localhost:8081
+#        }
+#      }
+#    '';
+#  };
 
-    extraConfig = {
-      email-domain = "*"; # We require membership in the tiiuae org
-      auth-logging = true;
-      request-logging = true;
-      standard-logging = true;
-      reverse-proxy = true; # Needed according to https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration#configuring-for-use-with-the-caddy-v2-forward_auth-directive
-      scope = "openid profile email groups"; # pass github teams as jenkins groups
-      provider-display-name = "Vedenemo Auth";
-      custom-sign-in-logo = "-";
-    };
-  };
-
-  # Wait for cloud-init mounting before we start oauth2-proxy.
-  systemd.services.oauth2-proxy = {
-    after = [ "cloud-init.service" ];
-    requires = [ "cloud-init.service" ];
-    serviceConfig.EnvironmentFile = "/var/lib/oauth2-proxy.env";
-  };
-
-  # Wait for cloud-init mounting before we start caddy.
-  systemd.services.caddy = {
-    after = [ "cloud-init.service" ];
-    requires = [ "cloud-init.service" ];
-    serviceConfig.EnvironmentFile = "/var/lib/caddy/caddy.env";
-  };
+#  services.oauth2-proxy = {
+#    enable = false;
+#
+#    # We inject cookie secret, client id and client secret through terraform in cloud-init
+#    clientID = null;
+#    clientSecret = null;
+#    cookie.secret = null;
+#
+#    provider = "oidc";
+#    oidcIssuerUrl = "https://auth.vedenemo.dev";
+#    setXauthrequest = true;
+#    cookie.secure = false;
+#
+#    extraConfig = {
+#      email-domain = "*"; # We require membership in the tiiuae org
+#      auth-logging = true;
+#      request-logging = true;
+#      standard-logging = true;
+#      reverse-proxy = true; # Needed according to https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration#configuring-for-use-with-the-caddy-v2-forward_auth-directive
+#      scope = "openid profile email groups"; # pass github teams as jenkins groups
+#      provider-display-name = "Vedenemo Auth";
+#      custom-sign-in-logo = "-";
+#    };
+#  };
+#
+#  # Wait for cloud-init mounting before we start oauth2-proxy.
+#  systemd.services.oauth2-proxy = {
+#    after = [ "cloud-init.service" ];
+#    requires = [ "cloud-init.service" ];
+#    serviceConfig.EnvironmentFile = "/var/lib/oauth2-proxy.env";
+#  };
+#
+#  # Wait for cloud-init mounting before we start caddy.
+#  systemd.services.caddy = {
+#    after = [ "cloud-init.service" ];
+#    requires = [ "cloud-init.service" ];
+#    serviceConfig.EnvironmentFile = "/var/lib/caddy/caddy.env";
+#  };
 
   # Configure Nix to use the bucket (through rclone-http) as a substitutor.
   # The public key is passed in externally.

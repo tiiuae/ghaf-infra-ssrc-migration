@@ -129,7 +129,7 @@ def alias_list(_c: Any) -> None:
         row = [alias, host.nixosconfig, host.hostname]
         table_rows.append(row)
     table = tabulate(table_rows, headers="firstrow", tablefmt="fancy_outline")
-    print(f"\nCurrent ghaf-infra targets:\n\n{table}")
+    print(f"\nCurrent ghaf-infra-ssd targets:\n\n{table}")
 
 
 @task
@@ -429,7 +429,7 @@ def print_revision(_c: Any, alias: str = "") -> None:
             ).stdout.strip()
             if "-dirty" not in rev:
                 # Format as terminal link: https://github.com/Alhadis/OSC8-Adoption/
-                url = f"https://github.com/tiiuae/ghaf-infra/commit/{rev}"
+                url = f"https://github.com/tiiuae/ghaf-infra-ssd/commit/{rev}"
                 rev_link = f"\033]8;;{url}\033\\{rev}\033]8;;\033\\"
             else:
                 rev_link = rev

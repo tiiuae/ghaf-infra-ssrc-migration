@@ -62,7 +62,7 @@ resource "azurerm_storage_account" "tfstate" {
 }
 
 resource "azurerm_storage_container" "tfstate" {
-  name                  = "ghaf-infra-tfstate-container"
+  name                  = "ghaf-infra-ssrc-tfstate-container"
   storage_account_name  = azurerm_storage_account.tfstate.name
   container_access_type = "private"
   lifecycle {

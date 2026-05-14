@@ -66,6 +66,11 @@ in
     vim
     htop
     tree
+    jq
+    curl
+    softhsm
+    nix-eval-jobs
+    jfrog-cli
   ];
 
 }

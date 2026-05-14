@@ -68,9 +68,9 @@
               # in https://ssrc.atlassian.net/browse/SP-4926.
               # TODO:
               # Below override is no longer needed when the azurerm version we
-              # get from the nixpkgs pinned in ghaf-infra flake includes a fix for
+              # get from the nixpkgs pinned in ghaf-infra-ssd flake includes a fix for
               # https://github.com/hashicorp/terraform-provider-azurerm/issues/24444.
-              # At the time of writing, ghaf-infra flake pins to
+              # At the time of writing, ghaf-infra-ssd flake pins to
               # nixos-24.05, that ships with azurerm v3.97.1 which is broken.
               # For more information on the available azurerm versions, see:
               # https://registry.terraform.io/providers/hashicorp/azurerm.

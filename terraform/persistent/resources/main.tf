@@ -20,8 +20,8 @@ terraform {
   backend "azurerm" {
     # resource_group_name and storage_account_name are set by the callee
     # from command line in terraform init, see terraform-init.sh
-    container_name = "ghaf-infra-tfstate-container"
-    key            = "ghaf-infra-persistent.tfstate"
+    container_name = "ghaf-infra-ssrc-tfstate-container"
+    key            = "ghaf-infra-ssrc-persistent.tfstate"
   }
 }
 
@@ -75,7 +75,7 @@ resource "secret_resource" "binary_cache_signing_key_pub" {
 module "binary_cache_sigkey" {
   source = "../binary-cache-sigkey"
   # Must be globally unique, max 24 characters
-  bincache_keyvault_name = "bchek-id0${local.ws}"
+  bincache_keyvault_name = "bchek-ssrc-id0${local.ws}"
   signing_key            = secret_resource.binary_cache_signing_key
   signing_key_pub        = secret_resource.binary_cache_signing_key_pub
   resource_group_name    = data.azurerm_resource_group.persistent.name
@@ -87,7 +87,7 @@ module "binary_cache_sigkey" {
 module "binary_cache_storage" {
   source = "../binary-cache-storage"
   # Must be globally unique, max 24 characters
-  bincache_storage_account_name = "bchesid0${local.ws}"
+  bincache_storage_account_name = "bchesssrcid0${local.ws}"
   resource_group_name           = data.azurerm_resource_group.persistent.name
   location                      = data.azurerm_resource_group.persistent.location
 }

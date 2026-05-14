@@ -21,7 +21,7 @@ usage () {
     echo ""
     echo "Usage: $MYNAME [-h] [-v] [-l LOCATION] [-d] -w WORKSPACE"
     echo ""
-    echo "Initialize ghaf-infra workspace with the given name (-w WORKSPACE). This"
+    echo "Initialize ghaf-infra-ssrc workspace with the given name (-w WORKSPACE). This"
     echo "script will not destroy or re-initialize anything if the initialization"
     echo "has already been done earlier."
     echo ""
@@ -43,10 +43,10 @@ usage () {
     echo ""
     echo "Example:"
     echo ""
-    echo "  Following command initializes ghaf-infra instance 'myghafinfra'"
+    echo "  Following command initializes ghaf-infra-ssrc instance 'myghafinfrassrc'"
     echo "  on the default Azure location (northeurope):"
     echo ""
-    echo "  $MYNAME -w myghafinfra"
+    echo "  $MYNAME -w myghafinfrassrc"
     echo ""
 }
 
@@ -127,10 +127,10 @@ azure_location_to_shortloc () {
 set_env () {
     # Assign variables STATE_RG, STATE_ACCOUNT and PERSISTENT_RG: these
     # variables are used to select the remote state storage and persistent
-    # data used in this ghaf-infra instance.
-    STATE_RG="ghaf-infra-0-state-${SHORTLOC}"
-    STATE_ACCOUNT="ghafinfra0state${SHORTLOC}"
-    PERSISTENT_RG="ghaf-infra-0-persistent-${SHORTLOC}"
+    # data used in this ghaf-infra-ssrc instance.
+    STATE_RG="ghaf-infra-ssrc-0-state-${SHORTLOC}"
+    STATE_ACCOUNT="ghafinfrassrc0state${SHORTLOC}"
+    PERSISTENT_RG="ghaf-infra-ssrc-0-persistent-${SHORTLOC}"
     echo "[+] Using state '$STATE_RG'"
     echo "[+] Using persistent '$PERSISTENT_RG'"
     echo "storage_account_rg_name=$STATE_RG" >"$MYDIR/.env"
@@ -195,7 +195,7 @@ init_persistent_resources () {
     for env in "release" "prod" "priv"; do
         ws="$env${SHORTLOC}"
         terraform workspace select -or-create "$ws" >"$OUT"
-        import_bincache_sigkey "$env-cache.vedenemo.dev~1"
+        import_bincache_sigkey "ghaf-infra-ssrc-$env"
     done
     popd >"$OUT"
 }
@@ -222,7 +222,7 @@ init_workspace () {
     terraform workspace list
     echo "[+] Use 'terraform workspace select <name>' to select a"\
          "workspace, then 'terraform [validate|plan|apply]' to work with the"\
-         "given ghaf-infra environment"
+         "given ghaf-infra-ssrc environment"
     popd >"$OUT"
 }
 

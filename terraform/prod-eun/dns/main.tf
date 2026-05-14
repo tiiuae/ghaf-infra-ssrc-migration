@@ -10,7 +10,7 @@ variable "environment_name" {
 }
 
 locals {
-  dns_suffix = "${replace(var.environment_name, "/^ghaf-infra-/", "")}.az.vedenemo.dev"
+  dns_suffix = "${replace(var.environment_name, "/^ghaf-infra-ssd-/", "")}.az.vedenemo.dev"
 }
 
 resource "azurerm_dns_zone" "main" {

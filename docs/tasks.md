@@ -7,7 +7,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 Originally inspired by [nix-community infra](https://github.com/nix-community/infra) this project makes use of [pyinvoke](https://www.pyinvoke.org/) to help with deployment [tasks](../tasks.py).
 
-All example commands in this document are executed in ghaf-infra nix devshell:
+All example commands in this document are executed in ghaf-infra-ssd nix devshell:
 ```bash
 ❯ nix develop
 ```
@@ -30,12 +30,12 @@ In the following sections, we will explain the intended usage of the most common
 
 ## alias-list
 
-The `alias-list` task lists the alias names for ghaf-infra targets. Alias is simply a name given for the combination of nixosConfig and hostname. All ghaf-infra tasks that need to identify a target, accept an alias name as an argument.
+The `alias-list` task lists the alias names for ghaf-infra-ssd targets. Alias is simply a name given for the combination of nixosConfig and hostname. All ghaf-infra-ssd tasks that need to identify a target, accept an alias name as an argument.
 
 ```bash
 ❯ inv alias-list
 
-Current ghaf-infra targets:
+Current ghaf-infra-ssd targets:
 
 ╒═══════════════════╤═══════════════════╤═════════════════╕
 │ alias             │ nixosconfig       │ hostname        │
@@ -110,7 +110,7 @@ inv update-sops-files
 ## install-release
 
 The `install-release` task installs all the hosts in ci-release environment to allow ephemeral release builds.
-It runs the `install` task non-interactively on all the release environment hosts (Jenkins controller, nix remote builders), as well as [connects the relevant testagent](https://github.com/tiiuae/ghaf-infra/tree/main/hosts/hetzci#connect-test-agents) to the release Jenkins controller to fully automate the release environment setup.
+It runs the `install` task non-interactively on all the release environment hosts (Jenkins controller, nix remote builders), as well as [connects the relevant testagent](https://github.com/tiiuae/ghaf-infra-ssd/tree/main/hosts/hetzci#connect-test-agents) to the release Jenkins controller to fully automate the release environment setup.
 
 ```bash
 ❯ inv install-release
@@ -124,7 +124,7 @@ It runs the `install` task non-interactively on all the release environment host
 
 ## print-revision
 
-The `print-revision` task prints currently deployed ghaf-infra git revision for the given `alias` host:
+The `print-revision` task prints currently deployed ghaf-infra-ssd git revision for the given `alias` host:
 
 ```bash
 ❯ inv print-revision --alias=hetzarm
@@ -140,12 +140,12 @@ Currently deployed revision(s):
 ```
 
 The output table includes the following details:
-- `alias`: Target ghaf-infra host `alias` name
-- `revision`: Ghaf-infra git commit revision currently deployed on the target host. This detail is read from the remote host with command `nixos-version --configuration-revision`. On [OSC 8 compatible](https://github.com/Alhadis/OSC8-Adoption/) terminals, `revision` is a hyperlink to ghaf-infra github
+- `alias`: Target ghaf-infra-ssd host `alias` name
+- `revision`: Ghaf-infra git commit revision currently deployed on the target host. This detail is read from the remote host with command `nixos-version --configuration-revision`. On [OSC 8 compatible](https://github.com/Alhadis/OSC8-Adoption/) terminals, `revision` is a hyperlink to ghaf-infra-ssd github
 - `revision date`: Git log [committer date](https://git-scm.com/docs/git-log#Documentation/git-log.txt-cs) in short format
 - `revision subject`: Git log [commit subject](https://git-scm.com/docs/git-log#Documentation/git-log.txt-s)
 
-If `alias` is not specified, `print-revision` lists the deployed git revisions for all ghaf-infra hosts sorted by the git revision date:
+If `alias` is not specified, `print-revision` lists the deployed git revisions for all ghaf-infra-ssd hosts sorted by the git revision date:
 
 ```bash
 ❯ inv print-revision

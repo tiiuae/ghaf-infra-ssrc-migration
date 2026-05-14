@@ -20,8 +20,8 @@ terraform {
   backend "azurerm" {
     # resource_group_name and storage_account_name are set by the callee
     # from command line in terraform init, see terraform-init.sh
-    container_name = "ghaf-infra-tfstate-container"
-    key            = "ghaf-infra-persistent.tfstate"
+    container_name = "ghaf-infra-ssrc-tfstate-container"
+    key            = "ghaf-infra-ssrc-persistent.tfstate"
   }
 }
 
@@ -79,7 +79,7 @@ resource "azurerm_managed_disk" "jenkins_controller_caddy_state" {
 
 # Jenkins artifacts storage account and container
 resource "azurerm_storage_account" "jenkins_artifacts" {
-  name                            = "artifact${local.ws}"
+  name                            = "artifactssrc${local.ws}"
   resource_group_name             = data.azurerm_resource_group.persistent.name
   location                        = data.azurerm_resource_group.persistent.location
   account_tier                    = "Standard"
