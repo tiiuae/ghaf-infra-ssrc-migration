@@ -102,6 +102,7 @@ resource "azurerm_public_ip" "default" {
   domain_name_label   = var.virtual_machine_name
   resource_group_name = var.resource_group_name
   location            = var.location
+  SKU                 = "Standard"
   allocation_method   = "Static"
 }
 
