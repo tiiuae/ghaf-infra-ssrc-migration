@@ -14,3 +14,4 @@ terraform.tfstate.backup
 .pre-commit-config.yaml
 /*.qcow2
 ca.key
+terraform/terraform-secrets.yaml

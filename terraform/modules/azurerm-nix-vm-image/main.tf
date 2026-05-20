@@ -33,6 +33,7 @@ resource "azurerm_image" "default" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
+
   os_disk {
     blob_uri = azurerm_storage_blob.default.url
     os_state = "Generalized"

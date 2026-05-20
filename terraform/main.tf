@@ -129,12 +129,12 @@ locals {
     }
     prod = {
       persistent_id           = "prod"
-      vm_size_binarycache     = "Standard_D4_v3"
+      vm_size_binarycache     = "Standard_D4ads_v5"
       osdisk_size_binarycache = "250"
-      vm_size_builder_x86     = "Standard_F64s_v2"
-      vm_size_builder_aarch64 = "Standard_D8ps_v5"
+      vm_size_builder_x86     = "Standard_F48s_v2"
+      vm_size_builder_aarch64 = "Standard_D8ps_v6"
       osdisk_size_builder     = "250"
-      vm_size_controller      = "Standard_E16s_v4"
+      vm_size_controller      = "Standard_E16as_v6"
       osdisk_size_controller  = "2000"
       num_builders_x86        = 1
       num_builders_aarch64    = 1
@@ -150,8 +150,8 @@ locals {
       osdisk_size_builder     = "500"
       vm_size_controller      = "Standard_E4_v5"
       osdisk_size_controller  = "1000"
-      num_builders_x86        = 1
-      num_builders_aarch64    = 1
+      num_builders_x86        = []
+      num_builders_aarch64    = []
       ext_builder_machines    = []
       ext_builder_keyscan     = []
     }
