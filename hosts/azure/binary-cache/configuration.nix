@@ -102,5 +102,5 @@
   # Expose the HTTPS port. No need for HTTP, as caddy can use TLS-ALPN-01.
   networking.firewall.allowedTCPPorts = [443 80];
 
-  system.stateVersion = "23.05";
+  system.stateVersion = "25.11";
 }
